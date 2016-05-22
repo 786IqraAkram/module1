@@ -6,8 +6,6 @@ import socket
 import sys
 from thread import *
  
-conn = {}
-addr = {}
 HOST = ''   # Symbolic name meaning all available interfaces
 PORT = 5188 # Arbitrary non-privileged port
  
@@ -33,24 +31,7 @@ def clientthread(conn):
     #conn.send('Welcome to the server. Type something and hit enter\n') #send only takes string
      
     #infinite loop so that function do not terminate and thread do not end.
-    if conn[0]:
-	     while True:
-         
-        	#Receiving from client
-	        data = conn[0].recv(1024)
-        	reply = 'OK...' + data
-		if data:
-                	conn[1].sendall(reply)
-     
-    #came out of loop
-    conn.close()
-    if conn[1]:
-   	     while True:
-	    	#Receiving from client
-        	data = conn[1].recv(1024)
-        	reply = 'OK...' + data
-        	if data: 
-             		conn[0].sendall(reply)
+    
      
     #came out of loop
     conn.close()
@@ -67,5 +48,30 @@ while 1:
      
     #start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
     start_new_thread(clientthread ,(conn,))
- 
+          while True:
+                        data = conn.recv(1024)
+                        if conn == array[0]:
+                                conn = array[1]
+                                conn.sendall(data)
+                                conn = addr[0]
+                        elif conn == array[1]:
+                                conn = array[0]
+                                conn.sendall(data)
+                                conn = array[1]
+                        if not data:
+                                break
+          conn.close()
+          
+array =[] # this is to keep track of users
+i = 0
+#now keep talking with the client
+while 1:
+    #wait to accept a connection - blocking call
+    conn, addr = s.accept()
+    array.append(conn)
+    print 'Connected with ' + addr[0] + ':' + str(addr[1])
+    #start new thread takes 1st argument as a function name to be run, second i$
+    start_new_thread(clientthread ,(conn,))
+    i += 1
+    
 s.close()
